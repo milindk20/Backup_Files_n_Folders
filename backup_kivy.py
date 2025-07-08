@@ -159,7 +159,7 @@ class BackupLayout(BoxLayout):
     def reset(self, instance):
         self.source_dirs = []
         self.destination = ''
-        self.src_input.text = ''
+        self.update_src_spinner()
         self.dest_input.text = ''
         self.progress.value = 0
         self.progress_label.text = ''
