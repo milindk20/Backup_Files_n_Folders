@@ -166,6 +166,8 @@ class BackupLayout(BoxLayout):
 
 class BackupAppKivy(App):
     def build(self):
+        from kivy.core.window import Window
+        Window.size = (1000, 600)
         return BackupLayout()
 
 if __name__ == '__main__':
