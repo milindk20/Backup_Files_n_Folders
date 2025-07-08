@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Run Flask App",
+			"command": "/home/milind/Desktop/repo/BackupNew_py/.venv/bin/python",
+			"args": [
+				"app.py"
+			],
+			"group": "build",
+			"isBackground": false
+		}
+	]
+}

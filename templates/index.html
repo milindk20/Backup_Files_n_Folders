@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Directory Backup Tool</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Directory Backup Tool</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label for="source_dirs" class="form-label">Source Directories (separate with semicolon ;)</label>
+            <input type="text" class="form-control" id="source_dirs" name="source_dirs" placeholder="/path/to/dir1;/path/to/dir2" required>
+        </div>
+        <div class="mb-3">
+            <label for="destination" class="form-label">Destination Directory</label>
+            <input type="text" class="form-control" id="destination" name="destination" placeholder="/path/to/backup" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Backup</button>
+    </form>
+    <br>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+</div>
+</body>
+</html>
