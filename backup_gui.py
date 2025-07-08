@@ -125,8 +125,6 @@ class BackupApp:
         try:
             for src in self.source_dirs:
                 dest_path = os.path.join(self.destination, os.path.basename(src))
-                if os.path.exists(dest_path):
-                    shutil.rmtree(dest_path)
                 for root, dirs, files in os.walk(src):
                     rel_path = os.path.relpath(root, src)
                     dest_dir = os.path.join(dest_path, rel_path)
@@ -134,7 +132,9 @@ class BackupApp:
                     for file in files:
                         src_file = os.path.join(root, file)
                         dest_file = os.path.join(dest_dir, file)
-                        shutil.copy2(src_file, dest_file)
+                        # Incremental backup: only copy if dest does not exist or src is newer
+                        if not os.path.exists(dest_file) or os.path.getmtime(src_file) > os.path.getmtime(dest_file):
+                            shutil.copy2(src_file, dest_file)
                         self.copied_files += 1
                         self.update_progress()
             self.is_running = False
