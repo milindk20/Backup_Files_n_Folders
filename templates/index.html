@@ -8,7 +8,7 @@
 <body>
 <div class="container mt-5">
     <h2>Directory Backup Tool</h2>
-    <form method="post">
+    <form id="backup-form">
         <div class="mb-3">
             <label for="source_dirs" class="form-label">Source Directories (separate with semicolon ;)</label>
             <input type="text" class="form-control" id="source_dirs" name="source_dirs" placeholder="/path/to/dir1;/path/to/dir2" required>
@@ -19,14 +19,51 @@
         </div>
         <button type="submit" class="btn btn-primary">Backup</button>
     </form>
-    <br>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    <div class="mt-4">
+        <div class="progress">
+            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+        </div>
+        <div class="mt-2" id="progress-info"></div>
+    </div>
 </div>
+<script>
+const form = document.getElementById('backup-form');
+const progressBar = document.getElementById('progress-bar');
+const progressInfo = document.getElementById('progress-info');
+
+form.onsubmit = async function(e) {
+    e.preventDefault();
+    const source_dirs = document.getElementById('source_dirs').value.split(';').map(s => s.trim()).filter(Boolean);
+    const destination = document.getElementById('destination').value;
+    if (source_dirs.length === 0 || !destination) {
+        alert('Please enter source directories and destination.');
+        return;
+    }
+    await fetch('/start-backup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({source_dirs, destination})
+    });
+    pollProgress();
+};
+
+function pollProgress() {
+    fetch('/progress').then(r => r.json()).then(data => {
+        if (data.status === 'running' || data.status === 'starting') {
+            progressBar.style.width = data.percent + '%';
+            progressBar.textContent = data.percent + '%';
+            let eta = data.eta !== null ? ` | ETA: ${data.eta}s` : '';
+            progressInfo.textContent = `Copied ${data.copied_files} of ${data.total_files} files (${data.percent}%)${eta}`;
+            setTimeout(pollProgress, 500);
+        } else if (data.status === 'done') {
+            progressBar.style.width = '100%';
+            progressBar.textContent = '100%';
+            progressInfo.textContent = 'Backup completed!';
+        } else if (data.status === 'error') {
+            progressInfo.textContent = 'Error: ' + data.error;
+        }
+    });
+}
+</script>
 </body>
 </html>
