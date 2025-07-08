@@ -21,29 +21,72 @@ class BackupApp:
         self.create_widgets()
 
     def create_widgets(self):
-        frm = tk.Frame(self.root)
-        frm.pack(padx=20, pady=20)
+        self.root.configure(bg='#f4f6fa')
+        style = ttk.Style()
+        style.theme_use('clam')
+        style.configure('TButton', font=('Segoe UI', 11), padding=6)
+        style.configure('TLabel', font=('Segoe UI', 11))
+        style.configure('TEntry', font=('Segoe UI', 11))
+        style.configure('TProgressbar', thickness=20, troughcolor='#e0e0e0', background='#4a90e2')
 
-        tk.Label(frm, text='Source Directories:').grid(row=0, column=0, sticky='w')
-        self.src_listbox = tk.Listbox(frm, width=50, height=5)
-        self.src_listbox.grid(row=1, column=0, columnspan=2, pady=5)
-        tk.Button(frm, text='Add Folders', command=self.add_folders).grid(row=1, column=2, padx=5)
-        tk.Button(frm, text='Remove Selected', command=self.remove_selected).grid(row=1, column=3, padx=5)
+        title = tk.Label(self.root, text='Directory Backup Tool', font=('Segoe UI', 18, 'bold'), fg='#4a90e2', bg='#f4f6fa')
+        title.pack(pady=(18, 10))
 
-        tk.Label(frm, text='Destination Directory:').grid(row=2, column=0, sticky='w', pady=(10,0))
-        self.dest_entry = tk.Entry(frm, width=50)
-        self.dest_entry.grid(row=3, column=0, columnspan=2, pady=5)
-        tk.Button(frm, text='Select Folder', command=self.select_dest).grid(row=3, column=2, padx=5)
+        frm = tk.Frame(self.root, bg='#f4f6fa', highlightbackground='#d1d5db', highlightthickness=1, bd=0)
+        frm.pack(padx=30, pady=10, fill='both', expand=True)
 
-        self.progress = ttk.Progressbar(frm, length=400)
-        self.progress.grid(row=4, column=0, columnspan=4, pady=15)
-        self.progress_label = tk.Label(frm, text='')
-        self.progress_label.grid(row=5, column=0, columnspan=4)
+        # Source dirs
+        src_label = tk.Label(frm, text='Source Directories:', font=('Segoe UI', 12, 'bold'), bg='#f4f6fa')
+        src_label.grid(row=0, column=0, sticky='w', pady=(10, 2), columnspan=4)
+        self.src_listbox = tk.Listbox(frm, width=55, height=5, font=('Segoe UI', 10), bd=1, relief='solid', highlightthickness=0)
+        self.src_listbox.grid(row=1, column=0, columnspan=4, pady=5, padx=2, sticky='ew')
+        add_btn = ttk.Button(frm, text='Add Folder', command=self.add_folders)
+        add_btn.grid(row=2, column=0, pady=5, padx=(0, 5), sticky='w')
+        remove_btn = ttk.Button(frm, text='Remove Selected', command=self.remove_selected)
+        remove_btn.grid(row=2, column=1, pady=5, padx=(0, 5), sticky='w')
 
-        self.start_btn = tk.Button(frm, text='Start Backup', command=self.start_backup)
-        self.start_btn.grid(row=6, column=0, pady=10)
-        self.reset_btn = tk.Button(frm, text='Reset', command=self.reset)
-        self.reset_btn.grid(row=6, column=1, pady=10)
+        # Destination
+        dest_label = tk.Label(frm, text='Destination Directory:', font=('Segoe UI', 12, 'bold'), bg='#f4f6fa')
+        dest_label.grid(row=3, column=0, sticky='w', pady=(18, 2), columnspan=4)
+        self.dest_entry = ttk.Entry(frm, width=48)
+        self.dest_entry.grid(row=4, column=0, columnspan=3, pady=5, padx=(0, 5), sticky='ew')
+        dest_btn = ttk.Button(frm, text='Select Folder', command=self.select_dest)
+        dest_btn.grid(row=4, column=3, pady=5, sticky='w')
+
+        # Progress bar
+        self.progress = ttk.Progressbar(frm, length=420, style='TProgressbar')
+        self.progress.grid(row=5, column=0, columnspan=4, pady=20, padx=2, sticky='ew')
+        self.progress_label = tk.Label(frm, text='', font=('Segoe UI', 11), bg='#f4f6fa', fg='#333')
+        self.progress_label.grid(row=6, column=0, columnspan=4, pady=(0, 10))
+
+        # Buttons
+        self.start_btn = ttk.Button(frm, text='Start Backup', command=self.start_backup)
+        self.start_btn.grid(row=7, column=0, pady=10, padx=(0, 5), sticky='w')
+        self.reset_btn = ttk.Button(frm, text='Reset', command=self.reset)
+        self.reset_btn.grid(row=7, column=1, pady=10, padx=(0, 5), sticky='w')
+
+        # Tooltips
+        self.create_tooltip(add_btn, 'Add a source folder to backup (one at a time)')
+        self.create_tooltip(remove_btn, 'Remove the selected source folder(s)')
+        self.create_tooltip(dest_btn, 'Choose the destination folder for backup')
+        self.create_tooltip(self.start_btn, 'Start the backup process')
+        self.create_tooltip(self.reset_btn, 'Reset all fields and progress')
+
+    def create_tooltip(self, widget, text):
+        tooltip = tk.Toplevel(widget)
+        tooltip.withdraw()
+        tooltip.overrideredirect(True)
+        label = tk.Label(tooltip, text=text, background='#333', foreground='white', relief='solid', borderwidth=1, font=('Segoe UI', 9))
+        label.pack(ipadx=6, ipady=2)
+        def enter(event):
+            x = widget.winfo_rootx() + 40
+            y = widget.winfo_rooty() + 30
+            tooltip.geometry(f'+{x}+{y}')
+            tooltip.deiconify()
+        def leave(event):
+            tooltip.withdraw()
+        widget.bind('<Enter>', enter)
+        widget.bind('<Leave>', leave)
 
     def add_folders(self):
         dirs = filedialog.askdirectory(mustexist=True, title='Select Source Folder(s)')
