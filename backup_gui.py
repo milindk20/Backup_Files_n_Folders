@@ -5,22 +5,24 @@ import time
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
+# Main backup application class
 class BackupApp:
     def __init__(self, root):
         self.root = root
         self.root.title('Directory Backup Tool')
-        self.source_dirs = []
-        self.destination = ''
-        self.copied_files = 0
-        self.total_files = 0
-        self.start_time = None
+        self.source_dirs = []  # List of source directories
+        self.destination = ''  # Destination directory
+        self.copied_files = 0  # Number of files copied so far
+        self.total_files = 0   # Total number of files to copy
+        self.start_time = None # Start time for ETA calculation
         self.eta = None
         self.progress_percent = 0
-        self.is_running = False
-        self.thread = None
+        self.is_running = False # Backup running state
+        self.thread = None     # Thread for backup operation
         self.create_widgets()
 
     def create_widgets(self):
+        # Configure main window and styles
         self.root.configure(bg='#f4f6fa')
         style = ttk.Style()
         style.theme_use('clam')
@@ -35,7 +37,7 @@ class BackupApp:
         frm = tk.Frame(self.root, bg='#f4f6fa', highlightbackground='#d1d5db', highlightthickness=1, bd=0)
         frm.pack(padx=30, pady=10, fill='both', expand=True)
 
-        # Source dirs
+        # Source directories UI
         src_label = tk.Label(frm, text='Source Directories:', font=('Segoe UI', 12, 'bold'), bg='#f4f6fa')
         src_label.grid(row=0, column=0, sticky='w', pady=(10, 2), columnspan=4)
         self.src_listbox = tk.Listbox(frm, width=55, height=5, font=('Segoe UI', 10), bd=1, relief='solid', highlightthickness=0)
@@ -45,7 +47,7 @@ class BackupApp:
         remove_btn = ttk.Button(frm, text='Remove Selected', command=self.remove_selected)
         remove_btn.grid(row=2, column=1, pady=5, padx=(0, 5), sticky='w')
 
-        # Destination
+        # Destination directory UI
         dest_label = tk.Label(frm, text='Destination Directory:', font=('Segoe UI', 12, 'bold'), bg='#f4f6fa')
         dest_label.grid(row=3, column=0, sticky='w', pady=(18, 2), columnspan=4)
         self.dest_entry = ttk.Entry(frm, width=48)
@@ -53,19 +55,19 @@ class BackupApp:
         dest_btn = ttk.Button(frm, text='Select Folder', command=self.select_dest)
         dest_btn.grid(row=4, column=3, pady=5, sticky='w')
 
-        # Progress bar
+        # Progress bar and label
         self.progress = ttk.Progressbar(frm, length=420, style='TProgressbar')
         self.progress.grid(row=5, column=0, columnspan=4, pady=20, padx=2, sticky='ew')
         self.progress_label = tk.Label(frm, text='', font=('Segoe UI', 11), bg='#f4f6fa', fg='#333')
         self.progress_label.grid(row=6, column=0, columnspan=4, pady=(0, 10))
 
-        # Buttons
+        # Main action buttons
         self.start_btn = ttk.Button(frm, text='Start Backup', command=self.start_backup)
         self.start_btn.grid(row=7, column=0, pady=10, padx=(0, 5), sticky='w')
         self.reset_btn = ttk.Button(frm, text='Reset', command=self.reset)
         self.reset_btn.grid(row=7, column=1, pady=10, padx=(0, 5), sticky='w')
 
-        # Tooltips
+        # Tooltips for usability
         self.create_tooltip(add_btn, 'Add a source folder to backup (one at a time)')
         self.create_tooltip(remove_btn, 'Remove the selected source folder(s)')
         self.create_tooltip(dest_btn, 'Choose the destination folder for backup')
@@ -73,6 +75,7 @@ class BackupApp:
         self.create_tooltip(self.reset_btn, 'Reset all fields and progress')
 
     def create_tooltip(self, widget, text):
+        # Create a tooltip for a widget
         tooltip = tk.Toplevel(widget)
         tooltip.withdraw()
         tooltip.overrideredirect(True)
@@ -89,20 +92,22 @@ class BackupApp:
         widget.bind('<Leave>', leave)
 
     def add_folders(self):
+        # Add a source directory (Tkinter does not support multi-select)
         dirs = filedialog.askdirectory(mustexist=True, title='Select Source Folder(s)')
         if dirs:
-            # Tkinter does not support multi-select, so call multiple times
             if dirs not in self.source_dirs:
                 self.source_dirs.append(dirs)
                 self.src_listbox.insert(tk.END, dirs)
 
     def remove_selected(self):
+        # Remove selected source directories
         selected = list(self.src_listbox.curselection())
         for idx in reversed(selected):
             self.src_listbox.delete(idx)
             del self.source_dirs[idx]
 
     def select_dest(self):
+        # Select the destination directory
         dest = filedialog.askdirectory(mustexist=True, title='Select Destination Folder')
         if dest:
             self.destination = dest
@@ -110,6 +115,7 @@ class BackupApp:
             self.dest_entry.insert(0, dest)
 
     def count_files(self, dirs):
+        # Count total files in all source directories
         count = 0
         for d in dirs:
             for root, _, files in os.walk(d):
@@ -117,6 +123,7 @@ class BackupApp:
         return count
 
     def backup_worker(self):
+        # Worker thread for performing the backup
         self.is_running = True
         self.copied_files = 0
         self.total_files = self.count_files(self.source_dirs)
@@ -144,6 +151,7 @@ class BackupApp:
             self.progress_label.config(text=f'Error: {e}')
 
     def update_progress(self):
+        # Update the progress bar and label
         percent = int((self.copied_files / self.total_files) * 100) if self.total_files else 0
         elapsed = time.time() - self.start_time
         eta = int(elapsed * (self.total_files - self.copied_files) / self.copied_files) if self.copied_files else 0
@@ -152,6 +160,7 @@ class BackupApp:
         self.root.update_idletasks()
 
     def start_backup(self):
+        # Start the backup process in a new thread
         if self.is_running:
             messagebox.showinfo('Backup', 'Backup is already running.')
             return
@@ -167,10 +176,12 @@ class BackupApp:
         self.root.after(200, self.check_thread)
 
     def check_thread(self):
+        # Periodically check if the backup thread is still running
         if self.is_running:
             self.root.after(200, self.check_thread)
 
     def reset(self):
+        # Reset all fields and progress
         self.src_listbox.delete(0, tk.END)
         self.source_dirs = []
         self.dest_entry.delete(0, tk.END)

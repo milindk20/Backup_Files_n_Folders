@@ -12,23 +12,27 @@ from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.popup import Popup
 from kivy.clock import Clock
 
+# Main layout for the backup tool
 class BackupLayout(BoxLayout):
     def __init__(self, **kwargs):
+        # Initialize the main layout and state variables
         super().__init__(orientation='vertical', padding=20, spacing=10, **kwargs)
-        self.source_dirs = []
-        self.destination = ''
-        self.copied_files = 0
-        self.total_files = 0
-        self.start_time = None
-        self.is_running = False
-        self.thread = None
+        self.source_dirs = []  # List of source directories
+        self.destination = ''  # Destination directory
+        self.copied_files = 0  # Number of files copied so far
+        self.total_files = 0   # Total number of files to copy
+        self.start_time = None # Start time for ETA calculation
+        self.is_running = False # Backup running state
+        self.thread = None     # Thread for backup operation
         self.progress_percent = 0
         self.eta = 0
 
+        # Title label
         self.title = Label(text='[b]Directory Backup Tool[/b]', markup=True, font_size=28, color=(0.29,0.56,0.89,1), size_hint=(1, 0.15))
         self.add_widget(self.title)
 
         from kivy.uix.spinner import Spinner
+        # Source directories UI
         self.src_label = Label(text='Source Directories:', size_hint=(1, 0.08), bold=True)
         self.add_widget(self.src_label)
         src_box = BoxLayout(size_hint=(1, 0.12), spacing=10)
@@ -40,6 +44,7 @@ class BackupLayout(BoxLayout):
         src_box.add_widget(self.remove_src_btn)
         self.add_widget(src_box)
 
+        # Destination directory UI
         self.dest_label = Label(text='Destination Directory:', size_hint=(1, 0.08), bold=True)
         self.add_widget(self.dest_label)
         self.dest_input = TextInput(hint_text='Click "Select Folder" to choose', readonly=True, size_hint=(1, 0.08))
@@ -48,6 +53,7 @@ class BackupLayout(BoxLayout):
         self.add_widget(self.dest_btn)
 
         from kivy.uix.anchorlayout import AnchorLayout
+        # Progress bar and percent label
         self.progress = ProgressBar(max=100, value=0, size_hint=(1, None), height=40)
         progress_layout = AnchorLayout(size_hint=(1, 0.12))
         progress_layout.add_widget(self.progress)
@@ -57,6 +63,7 @@ class BackupLayout(BoxLayout):
         self.progress_label = Label(text='', size_hint=(1, 0.08))
         self.add_widget(self.progress_label)
 
+        # Main action buttons
         btn_layout = BoxLayout(size_hint=(1, 0.12), spacing=10)
         self.start_btn = Button(text='Start Backup', on_press=self.start_backup)
         self.reset_btn = Button(text='Reset', on_press=self.reset)
@@ -65,6 +72,7 @@ class BackupLayout(BoxLayout):
         self.add_widget(btn_layout)
 
     def add_folder(self, instance):
+        # Open a folder chooser popup to add a source directory
         chooser = FileChooserListView(path='/', dirselect=True, filters=['!*.pyc'])
         box = BoxLayout(orientation='vertical')
         box.add_widget(chooser)
@@ -82,6 +90,7 @@ class BackupLayout(BoxLayout):
         popup.open()
 
     def update_src_spinner(self):
+        # Update the spinner with the current source directories
         if self.source_dirs:
             self.src_spinner.values = self.source_dirs
             self.src_spinner.text = self.source_dirs[0]
@@ -90,12 +99,14 @@ class BackupLayout(BoxLayout):
             self.src_spinner.text = 'No folder selected'
 
     def remove_selected_folder(self, instance):
+        # Remove the selected source directory
         selected = self.src_spinner.text
         if selected in self.source_dirs:
             self.source_dirs.remove(selected)
             self.update_src_spinner()
 
     def select_dest(self, instance):
+        # Open a folder chooser popup to select the destination directory
         chooser = FileChooserListView(path='/', dirselect=True, filters=['!*.pyc'])
         box = BoxLayout(orientation='vertical')
         box.add_widget(chooser)
@@ -111,6 +122,7 @@ class BackupLayout(BoxLayout):
         popup.open()
 
     def count_files(self, dirs):
+        # Count total files in all source directories
         count = 0
         for d in dirs:
             for root, _, files in os.walk(d):
@@ -118,6 +130,7 @@ class BackupLayout(BoxLayout):
         return count
 
     def backup_worker(self):
+        # Worker thread for performing the backup
         self.is_running = True
         self.copied_files = 0
         self.total_files = self.count_files(self.source_dirs)
@@ -132,6 +145,7 @@ class BackupLayout(BoxLayout):
                     for file in files:
                         src_file = os.path.join(root, file)
                         dest_file = os.path.join(dest_dir, file)
+                        # Incremental backup: only copy if dest does not exist or src is newer
                         if not os.path.exists(dest_file) or os.path.getmtime(src_file) > os.path.getmtime(dest_file):
                             shutil.copy2(src_file, dest_file)
                         self.copied_files += 1
@@ -143,6 +157,7 @@ class BackupLayout(BoxLayout):
             Clock.schedule_once(lambda dt: self.progress_label.setter('text')(self.progress_label, f'Error: {e}'), 0)
 
     def update_progress(self):
+        # Update the progress bar and labels
         percent = int((self.copied_files / self.total_files) * 100) if self.total_files else 0
         elapsed = time.time() - self.start_time
         eta = int(elapsed * (self.total_files - self.copied_files) / self.copied_files) if self.copied_files else 0
@@ -151,6 +166,7 @@ class BackupLayout(BoxLayout):
         self.progress_label.text = f'Copied {self.copied_files} of {self.total_files} files ({percent}%) | ETA: {eta}s'
 
     def start_backup(self, instance):
+        # Start the backup process in a new thread
         if self.is_running:
             self.progress_label.text = 'Backup is already running.'
             return
@@ -163,6 +179,7 @@ class BackupLayout(BoxLayout):
         self.thread.start()
 
     def reset(self, instance):
+        # Reset all fields and progress
         self.source_dirs = []
         self.destination = ''
         self.update_src_spinner()
@@ -170,6 +187,7 @@ class BackupLayout(BoxLayout):
         self.progress.value = 0
         self.progress_label.text = ''
 
+# Main Kivy app class
 class BackupAppKivy(App):
     def build(self):
         from kivy.core.window import Window

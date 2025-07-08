@@ -4,10 +4,11 @@ import shutil
 import threading
 import time
 
+# Initialize Flask app
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-# Global progress state
+# Global progress state for tracking backup progress
 progress = {
     'total_files': 0,
     'copied_files': 0,
@@ -19,6 +20,7 @@ progress = {
 }
 
 def count_files(dirs):
+    # Count total files in all source directories
     count = 0
     for d in dirs:
         for root, _, files in os.walk(d):
@@ -26,6 +28,7 @@ def count_files(dirs):
     return count
 
 def backup_worker(source_dirs, destination):
+    # Worker thread for performing the backup
     global progress
     progress['status'] = 'running'
     progress['copied_files'] = 0
@@ -65,10 +68,12 @@ def backup_worker(source_dirs, destination):
 
 @app.route('/', methods=['GET'])
 def index():
+    # Render the main web UI
     return render_template('index.html')
 
 @app.route('/start-backup', methods=['POST'])
 def start_backup():
+    # Start the backup process in a new thread
     global progress
     data = request.json
     source_dirs = data.get('source_dirs', [])
@@ -83,6 +88,7 @@ def start_backup():
 
 @app.route('/progress', methods=['GET'])
 def get_progress():
+    # Return the current backup progress as JSON
     global progress
     return jsonify(progress)
 
