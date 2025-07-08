@@ -51,7 +51,7 @@ class BackupLayout(BoxLayout):
         self.progress = ProgressBar(max=100, value=0, size_hint=(1, None), height=40)
         progress_layout = AnchorLayout(size_hint=(1, 0.12))
         progress_layout.add_widget(self.progress)
-        self.progress_percent_label = Label(text='0%', size_hint=(None, None), size=(60, 40), font_size=18, color=(0.29,0.56,0.89,1))
+        self.progress_percent_label = Label(text='0%', size_hint=(None, None), size=(100, 40), font_size=28, color=(1,1,1,1), bold=True)
         progress_layout.add_widget(self.progress_percent_label)
         self.add_widget(progress_layout)
         self.progress_label = Label(text='', size_hint=(1, 0.08))
