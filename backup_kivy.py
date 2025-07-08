@@ -28,12 +28,17 @@ class BackupLayout(BoxLayout):
         self.title = Label(text='[b]Directory Backup Tool[/b]', markup=True, font_size=28, color=(0.29,0.56,0.89,1), size_hint=(1, 0.15))
         self.add_widget(self.title)
 
+        from kivy.uix.spinner import Spinner
         self.src_label = Label(text='Source Directories:', size_hint=(1, 0.08), bold=True)
         self.add_widget(self.src_label)
-        self.src_input = TextInput(hint_text='Click "Add Folder" to select', readonly=True, multiline=True, size_hint=(1, 0.15))
-        self.add_widget(self.src_input)
-        self.add_src_btn = Button(text='Add Folder', size_hint=(1, 0.08), on_press=self.add_folder)
-        self.add_widget(self.add_src_btn)
+        src_box = BoxLayout(size_hint=(1, 0.12), spacing=10)
+        self.src_spinner = Spinner(text='No folder selected', values=[], size_hint=(0.7, 1))
+        src_box.add_widget(self.src_spinner)
+        self.add_src_btn = Button(text='Add Folder', size_hint=(0.15, 1), on_press=self.add_folder)
+        src_box.add_widget(self.add_src_btn)
+        self.remove_src_btn = Button(text='Remove Selected', size_hint=(0.15, 1), on_press=self.remove_selected_folder)
+        src_box.add_widget(self.remove_src_btn)
+        self.add_widget(src_box)
 
         self.dest_label = Label(text='Destination Directory:', size_hint=(1, 0.08), bold=True)
         self.add_widget(self.dest_label)
@@ -58,30 +63,32 @@ class BackupLayout(BoxLayout):
         chooser = FileChooserListView(path='/', dirselect=True, filters=['!*.pyc'])
         box = BoxLayout(orientation='vertical')
         box.add_widget(chooser)
-        btn_layout = BoxLayout(size_hint=(1, 0.12), spacing=10)
-        btn_select = Button(text='Add', size_hint=(0.5, 1))
-        btn_remove = Button(text='Remove', size_hint=(0.5, 1))
-        btn_layout.add_widget(btn_select)
-        btn_layout.add_widget(btn_remove)
-        box.add_widget(btn_layout)
+        btn = Button(text='Add', size_hint=(1, 0.12))
+        box.add_widget(btn)
         popup = Popup(title='Select Source Folder', content=box, size_hint=(0.9, 0.9))
         def select_folder(instance):
             if chooser.selection:
                 folder = chooser.selection[0]
                 if folder not in self.source_dirs:
                     self.source_dirs.append(folder)
-                    self.src_input.text = '\n'.join(self.source_dirs)
+                    self.update_src_spinner()
             popup.dismiss()
-        def remove_folder(instance):
-            if chooser.selection:
-                folder = chooser.selection[0]
-                if folder in self.source_dirs:
-                    self.source_dirs.remove(folder)
-                    self.src_input.text = '\n'.join(self.source_dirs)
-            popup.dismiss()
-        btn_select.bind(on_press=select_folder)
-        btn_remove.bind(on_press=remove_folder)
+        btn.bind(on_press=select_folder)
         popup.open()
+
+    def update_src_spinner(self):
+        if self.source_dirs:
+            self.src_spinner.values = self.source_dirs
+            self.src_spinner.text = self.source_dirs[0]
+        else:
+            self.src_spinner.values = []
+            self.src_spinner.text = 'No folder selected'
+
+    def remove_selected_folder(self, instance):
+        selected = self.src_spinner.text
+        if selected in self.source_dirs:
+            self.source_dirs.remove(selected)
+            self.update_src_spinner()
 
     def select_dest(self, instance):
         chooser = FileChooserListView(path='/', dirselect=True, filters=['!*.pyc'])
