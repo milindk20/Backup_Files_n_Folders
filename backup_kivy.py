@@ -47,8 +47,13 @@ class BackupLayout(BoxLayout):
         self.dest_btn = Button(text='Select Folder', size_hint=(1, 0.08), on_press=self.select_dest)
         self.add_widget(self.dest_btn)
 
-        self.progress = ProgressBar(max=100, value=0, size_hint=(1, 0.08))
-        self.add_widget(self.progress)
+        from kivy.uix.anchorlayout import AnchorLayout
+        self.progress = ProgressBar(max=100, value=0, size_hint=(1, None), height=40)
+        progress_layout = AnchorLayout(size_hint=(1, 0.12))
+        progress_layout.add_widget(self.progress)
+        self.progress_percent_label = Label(text='0%', size_hint=(None, None), size=(60, 40), font_size=18, color=(0.29,0.56,0.89,1))
+        progress_layout.add_widget(self.progress_percent_label)
+        self.add_widget(progress_layout)
         self.progress_label = Label(text='', size_hint=(1, 0.08))
         self.add_widget(self.progress_label)
 
@@ -142,6 +147,7 @@ class BackupLayout(BoxLayout):
         elapsed = time.time() - self.start_time
         eta = int(elapsed * (self.total_files - self.copied_files) / self.copied_files) if self.copied_files else 0
         self.progress.value = percent
+        self.progress_percent_label.text = f'{percent}%'
         self.progress_label.text = f'Copied {self.copied_files} of {self.total_files} files ({percent}%) | ETA: {eta}s'
 
     def start_backup(self, instance):
