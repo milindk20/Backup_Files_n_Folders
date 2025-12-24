@@ -6,7 +6,7 @@ import time
 import logging
 
 # Configure logging for app.py
-logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='webapp.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('app')
 
 # Initialize Flask app
