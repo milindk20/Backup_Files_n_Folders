@@ -4,6 +4,11 @@ import threading
 import time
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
+import logging
+
+# Configure logging for backup_gui.py
+logging.basicConfig(filename='gui.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('gui')
 
 # Main backup application class
 class BackupApp:
@@ -129,6 +134,7 @@ class BackupApp:
         self.total_files = self.count_files(self.source_dirs)
         self.start_time = time.time()
         self.progress['maximum'] = self.total_files if self.total_files else 1
+        logger.info(f'Starting backup from {self.source_dirs} to {self.destination}')
         try:
             for src in self.source_dirs:
                 dest_path = os.path.join(self.destination, os.path.basename(src))
@@ -144,9 +150,11 @@ class BackupApp:
                             shutil.copy2(src_file, dest_file)
                         self.copied_files += 1
                         self.update_progress()
+            logger.info('Backup completed successfully')
             self.is_running = False
             self.progress_label.config(text='Backup completed!')
         except Exception as e:
+            logger.error(f'Backup failed: {e}')
             self.is_running = False
             self.progress_label.config(text=f'Error: {e}')
 

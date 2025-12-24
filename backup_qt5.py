@@ -7,6 +7,11 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QTimer
 import sys
+import logging
+
+# Configure logging for backup_qt5.py
+logging.basicConfig(filename='qt5.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('qt5')
 
 # Main backup application class using PyQt5
 class BackupAppQt(QWidget):
@@ -130,6 +135,7 @@ class BackupAppQt(QWidget):
         self.copied_files = 0
         self.total_files = self.count_files(self.source_dirs)
         self.start_time = time.time()
+        logger.info(f'Starting backup from {self.source_dirs} to {self.destination}')
         try:
             for src in self.source_dirs:
                 dest_path = os.path.join(self.destination, os.path.basename(src))
@@ -144,8 +150,10 @@ class BackupAppQt(QWidget):
                         if not os.path.exists(dest_file) or os.path.getmtime(src_file) > os.path.getmtime(dest_file):
                             shutil.copy2(src_file, dest_file)
                         self.copied_files += 1
+            logger.info('Backup completed successfully')
             self.is_running = False
         except Exception as e:
+            logger.error(f'Backup failed: {e}')
             self.is_running = False
             self.progress_label.setText(f'Error: {e}')
 

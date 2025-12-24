@@ -3,6 +3,11 @@ import os
 import shutil
 import threading
 import time
+import logging
+
+# Configure logging for app.py
+logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('app')
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -34,6 +39,7 @@ def backup_worker(source_dirs, destination):
     progress['copied_files'] = 0
     progress['start_time'] = time.time()
     progress['error'] = None
+    logger.info(f'Starting backup from {source_dirs} to {destination}')
     try:
         total_files = count_files(source_dirs)
         progress['total_files'] = total_files
@@ -61,8 +67,10 @@ def backup_worker(source_dirs, destination):
                         if copied > 0:
                             eta = elapsed * (total_files - copied) / copied
                             progress['eta'] = int(eta)
+        logger.info('Backup completed successfully')
         progress['status'] = 'done'
     except Exception as e:
+        logger.error(f'Backup failed: {e}')
         progress['status'] = 'error'
         progress['error'] = str(e)
 
@@ -84,6 +92,7 @@ def start_backup():
     progress['status'] = 'starting'
     thread = threading.Thread(target=backup_worker, args=(source_dirs, destination))
     thread.start()
+    logger.info(f'Backup initiated for sources: {source_dirs} to {destination}')
     return jsonify({'status': 'started'})
 
 @app.route('/progress', methods=['GET'])

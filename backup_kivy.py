@@ -2,6 +2,12 @@ import os
 import shutil
 import threading
 import time
+import logging
+
+# Configure logging for backup_kivy.py
+logging.basicConfig(filename='kivy.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger('kivy')
+
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -135,6 +141,7 @@ class BackupLayout(BoxLayout):
         self.copied_files = 0
         self.total_files = self.count_files(self.source_dirs)
         self.start_time = time.time()
+        logger.info(f'Starting backup from {self.source_dirs} to {self.destination}')
         try:
             for src in self.source_dirs:
                 dest_path = os.path.join(self.destination, os.path.basename(src))
@@ -150,9 +157,11 @@ class BackupLayout(BoxLayout):
                             shutil.copy2(src_file, dest_file)
                         self.copied_files += 1
                         Clock.schedule_once(lambda dt: self.update_progress(), 0)
+            logger.info('Backup completed successfully')
             self.is_running = False
             Clock.schedule_once(lambda dt: self.progress_label.setter('text')(self.progress_label, 'Backup completed!'), 0)
         except Exception as e:
+            logger.error(f'Backup failed: {e}')
             self.is_running = False
             Clock.schedule_once(lambda dt: self.progress_label.setter('text')(self.progress_label, f'Error: {e}'), 0)
 
