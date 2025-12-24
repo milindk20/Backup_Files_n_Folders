@@ -10,7 +10,7 @@ import logging
 # --------------------------------------------------
 
 # Set to True to log every copied file name
-LOG_FILE_NAMES = True
+LOG_FILE_NAMES = False
 
 # --------------------------------------------------
 # Logging configuration
