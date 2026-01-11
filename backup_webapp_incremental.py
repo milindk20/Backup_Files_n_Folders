@@ -34,12 +34,14 @@ app.secret_key = 'your_secret_key'
 progress = {
     'total_files': 0,
     'copied_files': 0,
+    'failed_files': 0,
     'start_time': None,
     'eta': None,
     'percent': 0,
     'status': 'idle',
     'error': None
 }
+
 
 # --------------------------------------------------
 # Incremental backup helpers
@@ -156,9 +158,21 @@ def backup_worker(source_dirs, destination):
                     if not should_copy(src_file, dest_file):
                         continue
 
-                    shutil.copy2(src_file, dest_file)
-                    copied += 1
-                    progress['copied_files'] = copied
+                    try:
+                        shutil.copy2(src_file, dest_file)
+                        copied += 1
+                        progress['copied_files'] = copied
+
+                        if LOG_FILE_NAMES:
+                            logger.info(f"Copied: {src_file} -> {dest_file}")
+
+                    except Exception as e:
+                        progress['failed_files'] += 1
+                        logger.error(
+                            f"Failed to copy: {src_file} -> {dest_file} | Error: {e}"
+                        )
+                        continue
+
 
                     if LOG_FILE_NAMES:
                         logger.info(
