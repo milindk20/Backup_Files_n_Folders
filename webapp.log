@@ -42,3 +42,25 @@
 2026-01-18 18:38:27,958 - INFO - Removed (mirror): /media/milind/MyDisk/repo/test_backup/destination/source/Boku no Hero Academia S2 - 23.mkv
 2026-01-18 18:38:27,959 - INFO - Backup complete: 2/2 copied (19 total scanned)
 2026-01-18 18:38:28,055 - INFO - 127.0.0.1 - - [18/Jan/2026 18:38:28] "GET /progress HTTP/1.1" 200 -
+2026-01-18 19:25:06,785 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-01-18 19:25:06,814 - INFO - [33mPress CTRL+C to quit[0m
+2026-01-18 19:25:06,815 - INFO -  * Restarting with stat
+2026-01-18 19:25:06,944 - WARNING -  * Debugger is active!
+2026-01-18 19:25:06,946 - INFO -  * Debugger PIN: 143-218-324
+2026-01-18 19:25:13,788 - INFO - 127.0.0.1 - - [18/Jan/2026 19:25:13] "GET / HTTP/1.1" 200 -
+2026-01-18 19:25:15,077 - INFO - 127.0.0.1 - - [18/Jan/2026 19:25:15] "GET / HTTP/1.1" 200 -
+2026-01-18 19:25:40,768 - INFO - Backup started | Mode: MIRROR
+2026-01-18 19:25:40,769 - INFO - 127.0.0.1 - - [18/Jan/2026 19:25:40] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 19:25:40,773 - INFO - Backup complete: 0/0 copied (19 total scanned)
+2026-01-18 19:25:41,772 - INFO - 127.0.0.1 - - [18/Jan/2026 19:25:41] "GET /progress HTTP/1.1" 200 -
+2026-01-18 19:25:44,464 - INFO - Backup started | Mode: INCREMENTAL
+2026-01-18 19:25:44,465 - INFO - 127.0.0.1 - - [18/Jan/2026 19:25:44] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 19:25:44,468 - INFO - Backup complete: 0/0 copied (19 total scanned)
+2026-01-18 19:25:45,471 - INFO - 127.0.0.1 - - [18/Jan/2026 19:25:45] "GET /progress HTTP/1.1" 200 -
+2026-01-18 19:26:02,920 - INFO - Backup started | Mode: MIRROR
+2026-01-18 19:26:02,921 - INFO - 127.0.0.1 - - [18/Jan/2026 19:26:02] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 19:26:03,924 - INFO - 127.0.0.1 - - [18/Jan/2026 19:26:03] "GET /progress HTTP/1.1" 200 -
+2026-01-18 19:26:04,313 - INFO - Removed (mirror): /media/milind/MyDisk/repo/test_backup/destination/source/Boku no Hero Academia S2 - 23 (1).mkv
+2026-01-18 19:26:04,313 - INFO - Backup complete: 1/1 copied (19 total scanned)
+2026-01-18 19:26:04,925 - INFO - 127.0.0.1 - - [18/Jan/2026 19:26:04] "GET /progress HTTP/1.1" 200 -

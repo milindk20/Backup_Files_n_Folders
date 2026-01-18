@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Drive Backup</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 20px;
+}
+.container {
+    max-width: 720px;
+    margin: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.1);
+}
+textarea, input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 6px;
+}
+button {
+    margin-top: 15px;
+    padding: 10px;
+    font-size: 16px;
+}
+.progress {
+    margin-top: 20px;
+    height: 24px;
+    background: #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #4caf50;
+    color: #fff;
+    text-align: center;
+    line-height: 24px;
+}
+.stats, .error {
+    margin-top: 10px;
+    font-size: 14px;
+}
+.error { color: red; }
+.mode { margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>Drive Backup</h1>
+
+<label>Source Directories (one per line):</label>
+<textarea id="sources" rows="4"></textarea>
+
+<label>Destination Directory:</label>
+<input id="destination" type="text">
+
+<div class="mode">
+<strong>Backup Mode:</strong><br>
+<label>
+<input type="radio" name="mode" value="incremental" checked>
+Incremental (safe, no deletes)
+</label><br>
+<label>
+<input type="radio" name="mode" value="mirror">
+Mirror (delete removed files)
+</label>
+</div>
+
+<button onclick="startBackup()">Start Backup</button>
+
+<div class="progress">
+<div class="progress-bar" id="progressBar">0%</div>
+</div>
+
+<div class="stats" id="stats"></div>
+<div class="error" id="error"></div>
+</div>
+
+<script>
+let timer;
+
+function startBackup() {
+    document.getElementById('error').textContent = '';
+    updateBar(0);
+
+    const sources = document.getElementById('sources')
+        .value.split('\n').map(s => s.trim()).filter(Boolean);
+
+    const destination = document.getElementById('destination').value.trim();
+
+    const mirrorMode =
+        document.querySelector('input[name="mode"]:checked').value === 'mirror';
+
+    fetch('/start-backup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            source_dirs: sources,
+            destination: destination,
+            mirror_mode: mirrorMode
+        })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.status !== 'started') {
+            document.getElementById('error').textContent = d.message;
+            return;
+        }
+        timer = setInterval(fetchProgress, 1000);
+    });
+}
+
+function fetchProgress() {
+    fetch('/progress')
+        .then(r => r.json())
+        .then(p => {
+            updateBar(p.percent || 0);
+            document.getElementById('stats').textContent =
+                `Status: ${p.status} | ` +
+                `Copied: ${p.copied_files}/${p.total_files} | ` +
+                `Removed: ${p.removed_files || 0} | ` +
+                `Failed: ${p.failed_files} | ` +
+                `ETA: ${p.eta !== null ? p.eta + 's' : '-'}`;
+
+            if (p.status === 'done' || p.status === 'error') {
+                clearInterval(timer);
+            }
+        });
+}
+
+function updateBar(p) {
+    const bar = document.getElementById('progressBar');
+    bar.style.width = p + '%';
+    bar.textContent = p + '%';
+}
+</script>
+
+</body>
+</html>
