@@ -1,0 +1,44 @@
+2026-01-18 18:34:17,915 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-01-18 18:34:17,915 - INFO - [33mPress CTRL+C to quit[0m
+2026-01-18 18:34:17,916 - INFO -  * Restarting with stat
+2026-01-18 18:34:18,067 - WARNING -  * Debugger is active!
+2026-01-18 18:34:18,069 - INFO -  * Debugger PIN: 143-218-324
+2026-01-18 18:34:22,057 - INFO - 127.0.0.1 - - [18/Jan/2026 18:34:22] "GET / HTTP/1.1" 200 -
+2026-01-18 18:35:19,435 - INFO - Backup started | Mode: MIRROR
+2026-01-18 18:35:19,435 - INFO - 127.0.0.1 - - [18/Jan/2026 18:35:19] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 18:35:19,976 - INFO - Backup complete: 18/18 copied (18 total scanned)
+2026-01-18 18:35:20,439 - INFO - 127.0.0.1 - - [18/Jan/2026 18:35:20] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:35:52,153 - INFO - Backup started | Mode: INCREMENTAL
+2026-01-18 18:35:52,154 - INFO - 127.0.0.1 - - [18/Jan/2026 18:35:52] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 18:35:52,235 - INFO - Backup complete: 4/4 copied (18 total scanned)
+2026-01-18 18:35:53,157 - INFO - 127.0.0.1 - - [18/Jan/2026 18:35:53] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:36:06,433 - INFO - Backup started | Mode: INCREMENTAL
+2026-01-18 18:36:06,434 - INFO - 127.0.0.1 - - [18/Jan/2026 18:36:06] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 18:36:06,437 - INFO - Backup complete: 0/0 copied (17 total scanned)
+2026-01-18 18:36:07,438 - INFO - 127.0.0.1 - - [18/Jan/2026 18:36:07] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:36:26,114 - INFO - Backup started | Mode: MIRROR
+2026-01-18 18:36:26,114 - INFO - 127.0.0.1 - - [18/Jan/2026 18:36:26] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 18:36:26,118 - INFO - Removed (mirror): /media/milind/MyDisk/repo/test_backup/destination/source/IMG_20200602_092641.jpg
+2026-01-18 18:36:26,118 - INFO - Backup complete: 0/0 copied (17 total scanned)
+2026-01-18 18:36:27,118 - INFO - 127.0.0.1 - - [18/Jan/2026 18:36:27] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:37:27,923 - INFO - Backup started | Mode: MIRROR
+2026-01-18 18:37:27,923 - INFO - 127.0.0.1 - - [18/Jan/2026 18:37:27] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 18:37:28,958 - INFO - 127.0.0.1 - - [18/Jan/2026 18:37:28] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:37:29,959 - INFO - 127.0.0.1 - - [18/Jan/2026 18:37:29] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:37:30,959 - INFO - 127.0.0.1 - - [18/Jan/2026 18:37:30] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:37:31,958 - INFO - 127.0.0.1 - - [18/Jan/2026 18:37:31] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:37:32,024 - INFO - Backup complete: 19/19 copied (19 total scanned)
+2026-01-18 18:37:32,959 - INFO - 127.0.0.1 - - [18/Jan/2026 18:37:32] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:37:51,770 - INFO - Backup started | Mode: MIRROR
+2026-01-18 18:37:51,771 - INFO - 127.0.0.1 - - [18/Jan/2026 18:37:51] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 18:37:51,791 - INFO - Removed (mirror): /media/milind/MyDisk/repo/test_backup/destination/source/Boku no Hero Academia S2 - 24.mkv
+2026-01-18 18:37:51,791 - INFO - Backup complete: 0/0 copied (18 total scanned)
+2026-01-18 18:37:52,774 - INFO - 127.0.0.1 - - [18/Jan/2026 18:37:52] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:38:25,003 - INFO - Backup started | Mode: MIRROR
+2026-01-18 18:38:25,003 - INFO - 127.0.0.1 - - [18/Jan/2026 18:38:25] "POST /start-backup HTTP/1.1" 200 -
+2026-01-18 18:38:26,054 - INFO - 127.0.0.1 - - [18/Jan/2026 18:38:26] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:38:27,054 - INFO - 127.0.0.1 - - [18/Jan/2026 18:38:27] "GET /progress HTTP/1.1" 200 -
+2026-01-18 18:38:27,958 - INFO - Removed (mirror): /media/milind/MyDisk/repo/test_backup/destination/source/Boku no Hero Academia S2 - 23.mkv
+2026-01-18 18:38:27,959 - INFO - Backup complete: 2/2 copied (19 total scanned)
+2026-01-18 18:38:28,055 - INFO - 127.0.0.1 - - [18/Jan/2026 18:38:28] "GET /progress HTTP/1.1" 200 -

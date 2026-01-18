@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Directory Backup Tool</title>
+    <!-- Bootstrap CSS for styling -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>Directory Backup Tool</h2>
+    <!-- Backup form for user input -->
+    <form id="backup-form">
+        <div class="mb-3">
+            <label class="form-label">Source Directories</label>
+            <div id="sources"></div>
+            <button type="button" id="add-source" class="btn btn-secondary">Add Source Directory</button>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Destination Directory</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="destination" name="destination" placeholder="/path/to/backup" required>
+                <button type="button" class="btn btn-outline-secondary" onclick="browseDestination()">Browse</button>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Backup</button>
+    </form>
+    <div class="mt-4">
+        <!-- Progress bar -->
+        <div class="progress">
+            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+        </div>
+        <div class="mt-2" id="progress-info"></div>
+    </div>
+</div>
+<script>
+// Handle form submission and progress polling
+const form = document.getElementById('backup-form');
+const progressBar = document.getElementById('progress-bar');
+const progressInfo = document.getElementById('progress-info');
+
+function addSource(path = '') {
+    const div = document.createElement('div');
+    div.className = 'input-group mb-2';
+    div.innerHTML = `
+        <input type="text" class="form-control" placeholder="/path/to/dir" value="${path}" required>
+        <button type="button" class="btn btn-outline-secondary" onclick="browse(this)">Browse</button>
+        <button type="button" class="btn btn-outline-danger" onclick="removeSource(this)">Remove</button>
+    `;
+    document.getElementById('sources').appendChild(div);
+}
+
+function browse(btn) {
+    alert('Browse not supported in web browser. Enter path manually. Since directory browsing via web browsers is restricted for security reasons.');
+}
+
+function browseDestination() {
+    alert('Browse not supported in web browser. Enter path manually. Since directory browsing via web browsers is restricted for security reasons.');
+}
+
+function removeSource(btn) {
+    btn.parentElement.remove();
+}
+
+document.getElementById('add-source').addEventListener('click', () => addSource());
+
+// Add one initial source
+addSource();
+
+form.onsubmit = async function(e) {
+    e.preventDefault();
+    const source_dirs = Array.from(document.querySelectorAll('#sources input')).map(inp => inp.value.trim()).filter(Boolean);
+    const destination = document.getElementById('destination').value;
+    if (source_dirs.length === 0 || !destination) {
+        alert('Please enter source directories and destination.');
+        return;
+    }
+    await fetch('/start-backup', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({source_dirs, destination})
+    });
+    pollProgress();
+};
+
+// Poll the server for progress updates
+function pollProgress() {
+    fetch('/progress').then(r => r.json()).then(data => {
+        if (data.status === 'running' || data.status === 'starting') {
+            progressBar.style.width = data.percent + '%';
+            progressBar.textContent = data.percent + '%';
+            let eta = data.eta !== null ? ` | ETA: ${data.eta}s` : '';
+            progressInfo.textContent = `Copied ${data.copied_files} of ${data.total_files} files (${data.percent}%)${eta}`;
+            setTimeout(pollProgress, 500);
+        } else if (data.status === 'done') {
+            progressBar.style.width = '100%';
+            progressBar.textContent = '100%';
+            progressInfo.textContent = 'Backup completed!';
+        } else if (data.status === 'error') {
+            progressInfo.textContent = 'Error: ' + data.error;
+        }
+    });
+}
+</script>
+</body>
+</html>
